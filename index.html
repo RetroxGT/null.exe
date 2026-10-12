@@ -1,0 +1,368 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>null.exe</title>
+<style>
+:root {
+  --bg: #050609;
+  --panel: #0b0d13;
+  --panel2: #10131b;
+  --border: #262c3d;
+  --text: #edf0ff;
+  --muted: #858da8;
+  --purple: #a78bfa;
+  --cyan: #7dd3fc;
+  --red: #ff5364;
+  --green: #72f5b0;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: radial-gradient(ellipse at top, #111426 0%, var(--bg) 55%);
+  color: var(--text);
+  font-family: Consolas, "Courier New", monospace;
+  min-height: 100vh;
+  padding: 28px 18px;
+}
+button, input { font: inherit; }
+button { cursor: pointer; }
+button:focus-visible, input:focus-visible {
+  outline: 2px solid var(--purple);
+  outline-offset: 3px;
+}
+.container { max-width: 1150px; margin: auto; }
+header {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 20px; flex-wrap: wrap; margin-bottom: 26px;
+}
+.logo { font-size: clamp(30px, 5vw, 48px); font-weight: bold; letter-spacing: 3px; }
+.subtitle { color: var(--cyan); margin-top: 8px; }
+.pill {
+  border: 1px solid var(--border); border-radius: 30px;
+  padding: 10px 15px; color: var(--green); background: #0a1112;
+}
+.dot {
+  display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+  background: currentColor; margin-right: 8px;
+  box-shadow: 0 0 12px currentColor;
+}
+.panel {
+  background: linear-gradient(145deg, #0d1018ee, #080a10f5);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 22px;
+  box-shadow: 0 10px 35px #0005, inset 0 1px #ffffff08;
+  min-width: 0;
+}
+.panel-title {
+  font-size: 15px; font-weight: bold; margin-bottom: 20px;
+  display: flex; gap: 10px; align-items: center;
+}
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.diagnostics { grid-column: 1 / -1; }
+.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px; }
+.info {
+  display: flex; justify-content: space-between; gap: 12px;
+  padding: 8px 0; border-bottom: 1px solid #ffffff08;
+}
+.info span { color: var(--muted); }
+.info strong { text-align: right; overflow-wrap: anywhere; }
+.status {
+  margin-top: 18px; border: 1px solid var(--border); border-radius: 16px;
+  padding: 14px 16px; color: var(--cyan);
+  background: #0b1018;
+}
+.logs {
+  height: 135px; overflow-y: auto; line-height: 1.9;
+  color: #aeb9d8; font-size: 13px;
+}
+.red { color: var(--red); }
+.green { color: var(--green); }
+.muted { color: var(--muted); }
+.clipboard-card {
+  display: flex; align-items: center; gap: 14px;
+  padding: 18px; border-radius: 18px; border: 1px solid var(--border);
+  background: #0a0d14; width: 100%; color: var(--text); text-align: left;
+}
+.clipboard-card:hover, .btn:hover { border-color: var(--purple); }
+.clip-icon {
+  width: 48px; height: 48px; display: grid; place-items: center;
+  border: 1px solid var(--border); border-radius: 15px; font-size: 22px;
+}
+.clip-status { margin: 12px 4px 0; min-height: 20px; color: var(--green); font-size: 12px; }
+.terminal { min-height: 275px; display: flex; flex-direction: column; }
+.terminal-output { flex: 1; min-height: 140px; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.8; font-size: 13px; }
+.terminal-form { display: flex; gap: 10px; margin-top: 18px; align-items: center; }
+.prompt { white-space: nowrap; color: var(--cyan); }
+input {
+  min-width: 0; flex: 1; background: #070910; color: var(--text);
+  border: 1px solid var(--border); border-radius: 14px;
+  padding: 13px 15px;
+}
+.btn {
+  background: #101421; color: var(--text); border: 1px solid var(--border);
+  border-radius: 14px; padding: 12px 16px; transition: .2s;
+}
+.btn.primary { background: #18132a; border-color: #51417a; }
+.camera-box {
+  background: #05070c; border: 1px solid var(--border);
+  border-radius: 16px; min-height: 155px; margin-top: 14px;
+  display: grid; place-items: center; overflow: hidden;
+  color: var(--muted); text-align: center;
+}
+video { width: 100%; display: block; }
+.mouse-panel { margin-top: 18px; border-color: #51417a; }
+.help {
+  border-top: 1px solid var(--border); margin-top: 16px;
+  padding-top: 20px; text-align: center; font-size: 20px;
+  letter-spacing: 4px; color: var(--purple);
+}
+footer { margin-top: 18px; color: var(--muted); font-size: 11px; line-height: 1.8; }
+.hidden { display: none !important; }
+#leaveOverlay {
+  position: fixed; inset: 0; z-index: 99; background: #000;
+  display: none; align-items: center; justify-content: center;
+  color: white; letter-spacing: 3px;
+}
+@media (max-width: 760px) {
+  body { padding: 18px 12px; }
+  .grid, .info-grid { grid-template-columns: 1fr; }
+  .diagnostics { grid-column: auto; }
+  .panel { padding: 17px; }
+  .info { font-size: 12px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div>
+      <div class="logo">null.exe</div>
+      <div class="subtitle" id="subtitle">connection established...</div>
+    </div>
+    <div class="pill"><span class="dot"></span>system online</div>
+  </header>
+
+  <main class="grid">
+    <section class="panel diagnostics">
+      <div class="panel-title">⌁ visitor diagnostics</div>
+      <div class="info-grid">
+        <div class="info"><span>state:</span><strong>null</strong></div>
+        <div class="info"><span>screen resolution:</span><strong id="resolution">loading...</strong></div>
+        <div class="info"><span>ip:</span><strong id="ip">loading...</strong></div>
+        <div class="info"><span>language:</span><strong id="language">loading...</strong></div>
+        <div class="info"><span>time:</span><strong id="time">--:--:--</strong></div>
+        <div class="info"><span>session id:</span><strong id="session">unknown</strong></div>
+        <div class="info"><span>pop ups:</span><strong>null</strong></div>
+        <div class="info"><span>location:</span><strong>unknown</strong></div>
+        <div class="info"><span>browser:</span><strong id="browser">unknown</strong></div>
+        <div class="info"><span>device:</span><strong id="device">unknown</strong></div>
+        <div class="info"><span>operating system:</span><strong id="os">unknown</strong></div>
+        <div class="info"><span>connection:</span><strong>online</strong></div>
+      </div>
+      <div class="status"><span class="dot"></span><span id="analysis">analysis running...</span></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-title">▤ logs</div>
+      <div class="logs" id="logs">
+        <div>&gt; initializing null.exe...</div>
+        <div>&gt; loading system modules...</div>
+        <div>&gt; establishing connection...</div>
+        <div class="red">&gt; [!] unknown process detected</div>
+      </div>
+    </section>
+
+    <section>
+      <button class="clipboard-card" id="clipboard" type="button">
+        <span class="clip-icon">▣</span>
+        <span>
+          <strong>check your clip board :)</strong><br><br>
+          <span class="muted">(click to copy)</span>
+        </span>
+        <span style="margin-left:auto;font-size:20px">▢</span>
+      </button>
+      <div class="clip-status" id="clipStatus"></div>
+    </section>
+
+    <section class="panel terminal">
+      <div class="panel-title">⌁ terminal</div>
+      <div class="terminal-output" id="output">root@null:~# welcome.</div>
+      <form class="terminal-form" id="terminalForm">
+        <span class="prompt">root@null:~#</span>
+        <input id="command" placeholder="type a command..." autocomplete="off" spellcheck="false">
+        <button class="btn primary" type="submit" aria-label="Run command">➜</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <div class="panel-title">◎ wanna see you? :)</div>
+      <p class="muted" style="font-size:12px;line-height:1.7">
+        camera permission is requested only when you click. video stays in your browser.
+      </p>
+      <button class="btn primary" id="cameraBtn" type="button" style="width:100%">◎ enable camera</button>
+      <div class="camera-box" id="cameraBox">
+        <div id="cameraPlaceholder">◎<br><br>camera off</div>
+        <video id="video" autoplay playsinline class="hidden"></video>
+      </div>
+      <button class="btn hidden" id="stopCamera" type="button" style="width:100%;margin-top:10px">stop camera</button>
+      <p class="muted" style="font-size:11px;margin-bottom:0" id="cameraStatus">● camera not active</p>
+    </section>
+
+    <section class="panel mouse-panel">
+      <div class="panel-title">↖ leave your mouse...</div>
+      <div class="help">help.</div>
+    </section>
+  </main>
+
+  <footer>
+    ◈ public ip lookup uses an external service when available.<br>
+    this website does not save your ip or send it to discord.
+  </footer>
+</div>
+
+<div id="leaveOverlay">help.</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let detectedIP = "unavailable";
+let cameraStream = null;
+
+function addLog(message, className = "") {
+  const line = document.createElement("div");
+  line.textContent = "> " + message;
+  if (className) line.className = className;
+  $("logs").appendChild(line);
+  $("logs").scrollTop = $("logs").scrollHeight;
+}
+
+function updateTime() {
+  $("time").textContent = new Date().toLocaleTimeString();
+}
+setInterval(updateTime, 1000);
+updateTime();
+
+$("resolution").textContent = `${screen.width} x ${screen.height}`;
+$("language").textContent = navigator.language || "unknown";
+$("device").textContent = /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop";
+
+const ua = navigator.userAgent;
+$("browser").textContent =
+  ua.includes("Edg/") ? "edge" :
+  ua.includes("OPR/") ? "opera" :
+  ua.includes("Firefox/") ? "firefox" :
+  ua.includes("Chrome/") ? "chrome" :
+  ua.includes("Safari/") ? "safari" : "unknown";
+
+$("os").textContent =
+  /Windows/i.test(ua) ? "windows" :
+  /Mac OS/i.test(ua) ? "macos" :
+  /Android/i.test(ua) ? "android" :
+  /iPhone|iPad/i.test(ua) ? "ios" :
+  /Linux/i.test(ua) ? "linux" : "unknown";
+
+$("session").textContent = Array.from(crypto.getRandomValues(new Uint8Array(6)))
+  .map(n => n.toString(16).padStart(2, "0")).join("");
+
+async function loadIP() {
+  try {
+    const response = await fetch("https://ipapi.co/json/");
+    if (!response.ok) throw new Error("lookup unavailable");
+    const data = await response.json();
+    detectedIP = data.ip || "unavailable";
+    $("ip").textContent = detectedIP;
+    $("analysis").textContent = "analysis complete.";
+  } catch {
+    detectedIP = "unavailable";
+    $("ip").textContent = "unavailable";
+    $("analysis").textContent = "limited diagnostics.";
+  }
+}
+loadIP();
+
+$("clipboard").addEventListener("click", async () => {
+  const message =
+    "hi! im happy u see this! im sending ur info to my database discord! :)";
+  try {
+    await navigator.clipboard.writeText(message);
+    $("clipStatus").textContent = "✓ copied.";
+    addLog("clipboard message copied.");
+  } catch {
+    $("clipStatus").textContent = "clipboard unavailable — use a secure browser context.";
+  }
+});
+
+$("terminalForm").addEventListener("submit", event => {
+  event.preventDefault();
+  const command = $("command").value.trim().toLowerCase();
+  if (!command) return;
+
+  const output = $("output");
+  output.textContent += `\nroot@null:~# ${command}\n`;
+
+  const replies = {
+    help: "commands: help, clear, status, whoami, no",
+    status: "system online. diagnostics limited.",
+    whoami: "identity unknown.",
+    no: "you should not have typed that."
+  };
+
+  if (command === "clear") {
+    output.textContent = "";
+    addLog("terminal cleared.");
+  } else {
+    output.textContent += replies[command] || "command not found.";
+    if (command === "no") {
+      addLog("unrecognized input detected.", "red");
+      $("subtitle").textContent = "connection unstable...";
+    }
+  }
+  output.scrollTop = output.scrollHeight;
+  $("command").value = "";
+});
+
+$("cameraBtn").addEventListener("click", async () => {
+  if (!navigator.mediaDevices?.getUserMedia) {
+    $("cameraStatus").textContent = "camera unavailable in this browser.";
+    return;
+  }
+  try {
+    cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    $("video").srcObject = cameraStream;
+    $("video").classList.remove("hidden");
+    $("cameraPlaceholder").classList.add("hidden");
+    $("cameraBtn").classList.add("hidden");
+    $("stopCamera").classList.remove("hidden");
+    $("cameraStatus").textContent = "● camera active — local preview only";
+    addLog("camera enabled by visitor.");
+  } catch {
+    $("cameraStatus").textContent = "camera permission denied or unavailable.";
+    addLog("camera unavailable.");
+  }
+});
+
+$("stopCamera").addEventListener("click", () => {
+  if (cameraStream) cameraStream.getTracks().forEach(track => track.stop());
+  cameraStream = null;
+  $("video").srcObject = null;
+  $("video").classList.add("hidden");
+  $("cameraPlaceholder").classList.remove("hidden");
+  $("cameraBtn").classList.remove("hidden");
+  $("stopCamera").classList.add("hidden");
+  $("cameraStatus").textContent = "● camera not active";
+});
+
+const overlay = $("leaveOverlay");
+document.addEventListener("mouseleave", event => {
+  if (event.clientY <= 0) overlay.style.display = "flex";
+});
+window.addEventListener("blur", () => overlay.style.display = "flex");
+window.addEventListener("focus", () => overlay.style.display = "none");
+overlay.addEventListener("click", () => overlay.style.display = "none");
+</script>
+</body>
+</html>
+```
